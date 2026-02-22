@@ -40,24 +40,25 @@ body { font-family: 'Noto Serif KR', serif; background: var(--paper); color: var
 .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
 .book-title { font-size: 1.5rem; font-weight: 700; }
 .region-tag { font-size: 12px; color: var(--rust); font-weight: 500; }
-.content-box { background: rgba(213,230,213,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; line-height: 1.8; font-size: 14.5px; white-space: pre-wrap; }
 
-/* 사진 박스: 주소가 잘못되어도 깨진 아이콘이 안 보이도록 설정 */
-.photo-box img { width: 100%; border-radius: 4px; margin-top: 10px; border: 1px solid var(--aged); display: block; }
+/* 섹션 구분 디자인 */
+.section-label { font-size: 11px; font-weight: 700; color: var(--rust); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; display: block; }
+.quote-box { background: rgba(213,230,213,0.3); padding: 15px; border-radius: 4px; margin: 10px 0; border-left: 3px solid var(--gold); font-style: italic; line-height: 1.8; font-size: 14px; white-space: pre-wrap; }
+.review-box { background: rgba(255,255,255,0.5); padding: 15px; border: 1px dashed var(--aged); border-radius: 4px; margin: 10px 0; line-height: 1.8; font-size: 14.5px; white-space: pre-wrap; }
+
+.photo-box img { width: 100%; border-radius: 4px; margin-top: 15px; border: 1px solid var(--aged); display: block; }
 .photo-box img[src=""], .photo-box img:not([src]) { display: none; }
 
-.card-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
+.card-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px; }
 .btn-sm { background: none; border: 1px solid var(--aged); color: var(--muted); padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 
-/* MODAL: 글쓰기 칸 크기 확대 */
+/* MODAL */
 .modal-bg { display: none; position: fixed; inset: 0; background: var(--overlay); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
 .modal-bg.open { display: flex; }
 .modal { background: var(--paper2); width: 100%; max-width: 500px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 95vh; overflow-y: auto; }
-.modal h2 { margin-bottom: 15px; font-family: 'Playfair Display', serif; color: var(--rust); }
-input, select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid var(--aged); border-radius: 4px; font-family: inherit; background: white; }
-
-/* 텍스트 입력창 높이 확대 */
-textarea { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid var(--aged); border-radius: 4px; font-family: inherit; background: white; min-height: 300px; resize: vertical; }
+label { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 5px; display: block; }
+input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--aged); border-radius: 4px; font-family: inherit; background: white; }
+textarea { min-height: 150px; resize: vertical; }
 
 </style>
 </head>
@@ -82,18 +83,30 @@ textarea { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid va
 
 <div class="modal-bg" id="modalBg">
   <div class="modal">
-    <h2 id="modalTitle">기록하기</h2>
-    <input type="text" id="f-title" placeholder="책 제목">
+    <h2 id="modalTitle" style="margin-bottom:20px; color:var(--rust);">기록하기</h2>
+    
+    <label>책 제목</label>
+    <input type="text" id="f-title" placeholder="제목을 입력하세요">
+    
+    <label>지역 분류</label>
     <select id="f-region">
       <option value="아시아">아시아</option>
       <option value="유럽">유럽</option>
       <option value="미국">미국</option>
       <option value="기타">기타</option>
     </select>
-    <textarea id="f-text" placeholder="발췌 및 소감을 자유롭게 적어보세요."></textarea>
-    <input type="text" id="f-img" placeholder="이미지 주소 (JPG, PNG 등)">
+    
+    <label>발췌 (Quote)</label>
+    <textarea id="f-quote" placeholder="기억하고 싶은 문장을 적으세요."></textarea>
+    
+    <label>소감 (Review)</label>
+    <textarea id="f-review" placeholder="자신의 생각을 자유롭게 적으세요."></textarea>
+    
+    <label>이미지 주소 (URL)</label>
+    <input type="text" id="f-img" placeholder="JPG, PNG 등의 주소를 입력하세요">
+    
     <div style="display: flex; gap: 10px;">
-      <button class="btn-add" style="flex: 1;" onclick="handleSave()">저장</button>
+      <button class="btn-add" style="flex: 1;" onclick="handleSave()">저장하기</button>
       <button class="btn-add" style="flex: 1; background: var(--muted);" onclick="closeModal()">취소</button>
     </div>
   </div>
@@ -102,60 +115,6 @@ textarea { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid va
 <script>
 let books = JSON.parse(localStorage.getItem('lena_library') || '[]');
 let editId = null;
-
-// 초기 샘플 데이터
-if(books.length === 0) {
-    books = [{id: 1, title: '처첩성군', region: '아시아', text: '쑤퉁의 소설. 1920년대 중국 가부장제의 비극을 다룹니다.', img: ''}];
-    localStorage.setItem('lena_library', JSON.stringify(books));
-}
-
-function openModal(id = null) {
-    editId = id;
-    if(id) {
-        const b = books.find(item => item.id === id);
-        document.getElementById('f-title').value = b.title;
-        document.getElementById('f-region').value = b.region;
-        document.getElementById('f-text').value = b.text;
-        document.getElementById('f-img').value = b.img;
-        document.getElementById('modalTitle').innerText = "기록 수정하기";
-    } else {
-        document.getElementById('f-title').value = '';
-        document.getElementById('f-region').value = '아시아';
-        document.getElementById('f-text').value = '';
-        document.getElementById('f-img').value = '';
-        document.getElementById('modalTitle').innerText = "새 기록 남기기";
-    }
-    document.getElementById('modalBg').classList.add('open');
-}
-
-function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
-
-function handleSave() {
-    const title = document.getElementById('f-title').value;
-    const region = document.getElementById('f-region').value;
-    const text = document.getElementById('f-text').value;
-    const img = document.getElementById('f-img').value;
-
-    if(!title) return alert("제목을 입력해 주세요.");
-
-    if(editId) {
-        const idx = books.findIndex(b => b.id === editId);
-        books[idx] = { id: editId, title, region, text, img };
-    } else {
-        books.unshift({ id: Date.now(), title, region, text, img });
-    }
-    
-    localStorage.setItem('lena_library', JSON.stringify(books));
-    render();
-    closeModal();
-}
-
-function deleteBook(id) {
-    if(!confirm("이 기록을 삭제할까요?")) return;
-    books = books.filter(b => b.id !== id);
-    localStorage.setItem('lena_library', JSON.stringify(books));
-    render();
-}
 
 function render(filter = '전체') {
     const list = document.getElementById('bookList');
@@ -169,7 +128,8 @@ function render(filter = '전체') {
                     <h2 class="book-title">${b.title}</h2>
                     <span class="region-tag">[${b.region}]</span>
                 </div>
-                <div class="content-box">${b.text}</div>
+                ${b.quote ? `<span class="section-label">Quote</span><div class="quote-box">${b.quote}</div>` : ''}
+                ${b.review ? `<span class="section-label">Review</span><div class="review-box">${b.review}</div>` : ''}
                 ${b.img ? `<div class="photo-box"><img src="${b.img}" onerror="this.style.display='none'"></div>` : ''}
                 <div class="card-btns">
                     <button class="btn-sm" onclick="openModal(${b.id})">수정</button>
@@ -178,6 +138,58 @@ function render(filter = '전체') {
             </div>
         `;
     });
+}
+
+function openModal(id = null) {
+    editId = id;
+    if(id) {
+        const b = books.find(item => item.id === id);
+        document.getElementById('f-title').value = b.title;
+        document.getElementById('f-region').value = b.region;
+        document.getElementById('f-quote').value = b.quote || '';
+        document.getElementById('f-review').value = b.review || '';
+        document.getElementById('f-img').value = b.img;
+        document.getElementById('modalTitle').innerText = "기록 수정하기";
+    } else {
+        document.getElementById('f-title').value = '';
+        document.getElementById('f-quote').value = '';
+        document.getElementById('f-review').value = '';
+        document.getElementById('f-img').value = '';
+        document.getElementById('modalTitle').innerText = "새 기록 남기기";
+    }
+    document.getElementById('modalBg').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
+
+function handleSave() {
+    const title = document.getElementById('f-title').value;
+    const region = document.getElementById('f-region').value;
+    const quote = document.getElementById('f-quote').value;
+    const review = document.getElementById('f-review').value;
+    const img = document.getElementById('f-img').value;
+
+    if(!title) return alert("제목을 입력해 주세요.");
+
+    const data = { id: editId || Date.now(), title, region, quote, review, img };
+
+    if(editId) {
+        const idx = books.findIndex(b => b.id === editId);
+        books[idx] = data;
+    } else {
+        books.unshift(data);
+    }
+    
+    localStorage.setItem('lena_library', JSON.stringify(books));
+    render();
+    closeModal();
+}
+
+function deleteBook(id) {
+    if(!confirm("이 기록을 삭제할까요?")) return;
+    books = books.filter(b => b.id !== id);
+    localStorage.setItem('lena_library', JSON.stringify(books));
+    render();
 }
 
 function filterBy(region, btn) {
