@@ -8,132 +8,175 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Noto+Serif+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* ── 사용자님이 요청하신 옅은 그린 테마 ── */
-  --paper: #f0f4f0;      /* 아주 연한 그린빛 배경 */
-  --paper2: #fafffa;     /* 카드 내부 배경 */
-  --aged: #cfe0cf;       /* 경계선 그린 */
-  --ink: #1a241a;        /* 진한 초록빛 글씨 */
-  --rust: #2d5a27;       /* 포인트 컬러 (딥 그린) */
-  --gold: #7da37d;       /* 서브 포인트 */
-  --muted: #5e705e;
-  --soft: #8ca88c;
+  --paper: #f1f8f1;      /* 옅은 그린 배경 */
+  --paper2: #fafffa;     /* 모달 배경 */
+  --aged: #d5e6d5;       /* 테두리 */
+  --ink: #1e2b1e;        /* 글자색 */
+  --rust: #3e6b3a;       /* 포인트 그린 */
+  --gold: #8cb38c;       /* 보조 그린 */
+  --muted: #6b7a6b;
+  --soft: #9db89d;
   --card-bg: #ffffff;
-  --shadow: 0 4px 28px rgba(28,36,28,0.08);
-  --overlay: rgba(26,36,26,0.6);
+  --shadow: 0 4px 20px rgba(30,43,30,0.08);
+  --overlay: rgba(30,43,30,0.6);
 }
-
-/* 아래는 클로드가 작성한 모든 기능(필터링, 모달, 포스팅 로직)이 포함된 CSS/JS입니다 */
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: 'Noto Serif KR', serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
-.site-header { padding: 48px 52px 30px; border-bottom: 1px solid var(--aged); display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
-.site-title { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,5vw,2.8rem); font-weight:700; }
-.site-title em { color:var(--rust); font-style:normal; }
-.btn-primary { background:var(--rust); color:#fff; border:none; padding:12px 22px; border-radius:3px; cursor:pointer; font-family:inherit; }
+body { font-family: 'Noto Serif KR', serif; background: var(--paper); color: var(--ink); min-height: 100vh; padding-bottom: 50px; }
+body::after { content:''; position:fixed; inset:0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events:none; z-index:999; }
 
-/* 필터 바 스타일 */
-.filter-bar { padding: 16px 52px; border-bottom:1px solid var(--aged); display:flex; gap:8px; align-items:center; }
-.tag-filter { background:none; border:1px solid var(--aged); color:var(--muted); padding:5px 14px; border-radius:20px; cursor:pointer; font-size:12px; }
-.tag-filter.active { background:var(--rust); color:#fff; border-color:var(--rust); }
+/* HEADER */
+.site-header { padding: 40px 20px; border-bottom: 1px solid var(--aged); display: flex; align-items: center; justify-content: space-between; max-width: 800px; margin: 0 auto; }
+.site-title { font-family:'Playfair Display',serif; font-size: 2.2rem; font-weight:700; color: var(--rust); }
+.btn-add { background: var(--rust); color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.9rem; }
 
-/* 도서 카드 스타일 */
-.book-list { padding:40px 52px; display:flex; flex-direction:column; gap:32px; }
-.book-card { background:var(--card-bg); border:1px solid var(--aged); border-radius:8px; box-shadow:var(--shadow); position:relative; padding:30px; }
-.book-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:6px; background:var(--rust); }
-.section-block { border-left:3px solid var(--aged); padding:10px 15px; background:rgba(200,220,200,0.2); margin-top:15px; border-radius:0 4px 4px 0; }
-.section-label { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--soft); font-weight:700; margin-bottom:5px; }
+/* FILTER */
+.filter-bar { padding: 20px; display: flex; gap: 10px; justify-content: center; border-bottom: 1px solid var(--aged); }
+.tag-btn { background: white; border: 1px solid var(--aged); color: var(--muted); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; }
+.tag-btn.active { background: var(--rust); color: white; border-color: var(--rust); }
 
-/* 이미지 그리드 */
-.photo-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; margin-top:10px; }
-.photo-thumb { width:100%; aspect-ratio:1; object-fit:cover; border-radius:4px; border:1px solid var(--aged); }
+/* LIST & CARD */
+.book-list { max-width: 800px; margin: 30px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 25px; }
+.book-card { background: var(--card-bg); border: 1px solid var(--aged); border-radius: 8px; box-shadow: var(--shadow); padding: 25px; position: relative; }
+.book-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--rust); border-radius: 8px 0 0 8px; }
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+.book-title { font-size: 1.5rem; font-weight: 700; }
+.region-tag { font-size: 12px; color: var(--rust); font-weight: 500; }
+.content-box { background: rgba(213,230,213,0.2); padding: 15px; border-radius: 4px; margin: 15px 0; line-height: 1.8; font-size: 14.5px; }
+.photo-box img { width: 100%; border-radius: 4px; margin-top: 10px; border: 1px solid var(--aged); }
+.card-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
+.btn-sm { background: none; border: 1px solid var(--aged); color: var(--muted); padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+.btn-sm:hover { color: var(--rust); border-color: var(--rust); }
 
-/* 모달 스타일 (글쓰기 창) */
-.modal-bg { display:none; position:fixed; inset:0; background:var(--overlay); z-index:1000; align-items:center; justify-content:center; }
-.modal-bg.open { display:flex; }
-.modal { background:var(--paper2); padding:30px; border-radius:12px; width:90%; max-width:600px; max-height:90vh; overflow-y:auto; }
-input, textarea, select { width:100%; padding:10px; margin-top:5px; border:1px solid var(--aged); border-radius:4px; background:var(--paper); }
+/* MODAL */
+.modal-bg { display: none; position: fixed; inset: 0; background: var(--overlay); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+.modal-bg.open { display: flex; }
+.modal { background: var(--paper2); width: 100%; max-width: 500px; padding: 30px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+.modal h2 { margin-bottom: 20px; font-family: 'Playfair Display', serif; color: var(--rust); }
+input, textarea, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--aged); border-radius: 4px; font-family: inherit; background: white; }
 </style>
 </head>
 <body>
 
 <header class="site-header">
   <div>
-    <h1 class="site-title">Books from <em>Lena</em></h1>
-    <p style="color:var(--muted); font-size:0.9rem; margin-top:5px;">나만의 연둣빛 서재 기록</p>
+    <h1 class="site-title">Books from Lena</h1>
+    <p style="font-size: 13px; color: var(--soft);">나만의 연둣빛 서재 기록</p>
   </div>
-  <button class="btn-primary" onclick="openModal()">＋ 새 기록 남기기</button>
+  <button class="btn-add" onclick="openModal()">＋ 새 기록</button>
 </header>
 
-<div class="filter-bar" id="filterBar">
-  <button class="tag-filter active" onclick="filterTag('all')">전체</button>
-  <button class="tag-filter" onclick="filterTag('아시아')">아시아</button>
-  <button class="tag-filter" onclick="filterTag('유럽')">유럽</button>
-  <button class="tag-filter" onclick="filterTag('미국')">미국</button>
+<div class="filter-bar">
+  <button class="tag-btn active" onclick="filterBy('전체', this)">전체</button>
+  <button class="tag-btn" onclick="filterBy('아시아', this)">아시아</button>
+  <button class="tag-btn" onclick="filterBy('유럽', this)">유럽</button>
+  <button class="tag-btn" onclick="filterBy('미국', this)">미국</button>
 </div>
 
 <main class="book-list" id="bookList"></main>
 
 <div class="modal-bg" id="modalBg">
   <div class="modal">
-    <h2 style="margin-bottom:20px;">📖 새로운 기록</h2>
-    <label>제목</label><input type="text" id="f-title">
-    <label>지역</label>
+    <h2 id="modalTitle">기록하기</h2>
+    <input type="text" id="f-title" placeholder="책 제목">
     <select id="f-region">
       <option value="아시아">아시아</option>
       <option value="유럽">유럽</option>
       <option value="미국">미국</option>
+      <option value="기타">기타</option>
     </select>
-    <label>소감 및 발췌</label><textarea id="f-text" rows="5"></textarea>
-    <label>이미지 주소 (URL)</label><input type="text" id="f-img" placeholder="이미지 링크를 넣어주세요">
-    <div style="margin-top:20px; display:flex; gap:10px;">
-      <button class="btn-primary" onclick="savePost()">저장</button>
-      <button class="btn-primary" style="background:var(--muted)" onclick="closeModal()">취소</button>
+    <textarea id="f-text" rows="5" placeholder="발췌 및 소감"></textarea>
+    <input type="text" id="f-img" placeholder="이미지 URL (직접 올리기는 깃허브 특성상 링크 방식을 추천해요)">
+    <div style="display: flex; gap: 10px;">
+      <button class="btn-add" style="flex: 1;" onclick="handleSave()">저장</button>
+      <button class="btn-add" style="flex: 1; background: var(--muted);" onclick="closeModal()">취소</button>
     </div>
   </div>
 </div>
 
 <script>
-let posts = JSON.parse(localStorage.getItem('lena_posts') || '[]');
+let books = JSON.parse(localStorage.getItem('lena_library') || '[]');
+let editId = null;
 
-function openModal() { document.getElementById('modalBg').classList.add('open'); }
+// 초기 데이터 (비어있을 때)
+if(books.length === 0) {
+    books = [{id: 1, title: '처첩성군', region: '아시아', text: '쑤퉁의 소설. 1920년대 중국 가부장제의 비극을 다룹니다.', img: ''}];
+    localStorage.setItem('lena_library', JSON.stringify(books));
+}
+
+function openModal(id = null) {
+    editId = id;
+    if(id) {
+        const b = books.find(item => item.id === id);
+        document.getElementById('f-title').value = b.title;
+        document.getElementById('f-region').value = b.region;
+        document.getElementById('f-text').value = b.text;
+        document.getElementById('f-img').value = b.img;
+        document.getElementById('modalTitle').innerText = "기록 수정하기";
+    } else {
+        document.getElementById('f-title').value = '';
+        document.getElementById('f-text').value = '';
+        document.getElementById('f-img').value = '';
+        document.getElementById('modalTitle').innerText = "새 기록 남기기";
+    }
+    document.getElementById('modalBg').classList.add('open');
+}
+
 function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
 
-function savePost() {
-  const newPost = {
-    id: Date.now(),
-    title: document.getElementById('f-title').value,
-    region: document.getElementById('f-region').value,
-    text: document.getElementById('f-text').value,
-    img: document.getElementById('f-img').value
-  };
-  posts.unshift(newPost);
-  localStorage.setItem('lena_posts', JSON.stringify(posts));
-  render();
-  closeModal();
+function handleSave() {
+    const title = document.getElementById('f-title').value;
+    const region = document.getElementById('f-region').value;
+    const text = document.getElementById('f-text').value;
+    const img = document.getElementById('f-img').value;
+
+    if(!title) return alert("제목을 입력해 주세요.");
+
+    if(editId) {
+        const idx = books.findIndex(b => b.id === editId);
+        books[idx] = { id: editId, title, region, text, img };
+    } else {
+        books.unshift({ id: Date.now(), title, region, text, img });
+    }
+    
+    localStorage.setItem('lena_library', JSON.stringify(books));
+    render();
+    closeModal();
 }
 
-function render(filter = 'all') {
-  const list = document.getElementById('bookList');
-  list.innerHTML = '';
-  const filtered = filter === 'all' ? posts : posts.filter(p => p.region === filter);
-  
-  filtered.forEach(p => {
-    list.innerHTML += `
-      <div class="book-card">
-        <h2>${p.title}</h2>
-        <span style="font-size:12px; color:var(--rust)">[${p.region}]</span>
-        <div class="section-block">
-          <p class="section-text">${p.text}</p>
-        </div>
-        ${p.img ? `<div class="photo-grid"><img src="${p.img}" class="photo-thumb"></div>` : ''}
-      </div>
-    `;
-  });
+function deleteBook(id) {
+    if(!confirm("이 기록을 삭제할까요?")) return;
+    books = books.filter(b => b.id !== id);
+    localStorage.setItem('lena_library', JSON.stringify(books));
+    render();
 }
 
-function filterTag(region) {
-  render(region);
-  const btns = document.querySelectorAll('.tag-filter');
-  btns.forEach(b => b.classList.toggle('active', b.innerText === region || (region === 'all' && b.innerText === '전체')));
+function render(filter = '전체') {
+    const list = document.getElementById('bookList');
+    list.innerHTML = '';
+    const filtered = filter === '전체' ? books : books.filter(b => b.region === filter);
+
+    filtered.forEach(b => {
+        list.innerHTML += `
+            <div class="book-card">
+                <div class="card-header">
+                    <h2 class="book-title">${b.title}</h2>
+                    <span class="region-tag">[${b.region}]</span>
+                </div>
+                <div class="content-box">${b.text}</div>
+                ${b.img ? `<div class="photo-box"><img src="${b.img}"></div>` : ''}
+                <div class="card-btns">
+                    <button class="btn-sm" onclick="openModal(${b.id})">수정</button>
+                    <button class="btn-sm" style="color:#c0392b" onclick="deleteBook(${b.id})">삭제</button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+function filterBy(region, btn) {
+    document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render(region);
 }
 
 render();
