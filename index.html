@@ -8,13 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* 배경색: 은은한 웜화이트(아이보리) 느낌 유지 */
+  /* 배경색: 은은한 웜화이트(아이보리) */
   --bg-color: #fdfdf6; 
-  /* 포인트 색상: 책 표지의 파란색(Deep Blue) */
+  /* 포인트 색상: 딥 블루 */
   --accent-blue: #003f7f;
   --text-main: #222222;
   --text-muted: #666666;
   --border-color: #eeeeee;
+
+  /* 💡 뷰어 설정을 위한 동적 변수 (기본값) */
+  --post-font-size: 1rem;
+  --post-line-height: 1.8;
+  --post-padding: 30px;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -26,7 +31,7 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-color); col
 .site-title { font-family:'Playfair Display', serif; font-size: 2.5rem; font-weight:700; color: var(--accent-blue); margin-bottom: 8px; }
 .site-subtitle { font-size: 0.9rem; color: var(--text-muted); font-weight: 300; max-width: 500px; margin: 0 auto 20px; line-height: 1.6; }
 
-/* 💡 작고 세련된 구글 검색창 추가 */
+/* 구글 검색창 */
 .google-search-container { width: 100%; max-width: 320px; margin-bottom: 25px; }
 .google-search-form { 
     display: flex; align-items: center; background: white; border-radius: 50px; 
@@ -38,7 +43,7 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-color); col
 .google-search-form input { flex: 1; border: none; outline: none; background: transparent; font-family: 'Noto Sans KR', sans-serif; font-size: 0.85rem; color: var(--text-main); }
 .google-search-form input::placeholder { color: #bbb; }
 
-.btn-new { background: transparent; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px 24px; border-radius: 50px; cursor: pointer; font-size: 0.85rem; transition: 0.3s; }
+.btn-new { background: transparent; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px 24px; border-radius: 50px; cursor: pointer; font-size: 0.85rem; transition: 0.3s; font-weight: 500;}
 .btn-new:hover { background: var(--accent-blue); color: white; }
 
 /* 책장 그리드 스타일 */
@@ -51,21 +56,39 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-color); col
 .book-title { font-size: 0.95rem; font-weight: 700; line-height: 1.3; margin-bottom: 5px; word-break: keep-all; color: var(--text-main); }
 .book-author { font-size: 0.8rem; color: var(--text-muted); }
 
-/* 모달 스타일 */
+/* 모달 공통 */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 1000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
 .modal-overlay.open { display: flex; }
 .modal-content { background: white; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 40px; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); position: relative; border: 1px solid var(--border-color); }
 .close-btn { position: absolute; top: 20px; right: 25px; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); background: none; border: none; }
 
-/* 상세 보기 모달 스타일 */
+/* 상세 보기 모달 스타일 (뷰어 설정 적용 구역) */
 .detail-layout { display: flex; flex-direction: column; align-items: center; text-align: center; }
 .detail-cover { width: 160px; aspect-ratio: 2/3; object-fit: cover; border-radius: 2px 6px 6px 2px; box-shadow: 5px 10px 20px rgba(0,0,0,0.15); margin-bottom: 25px; }
+
+/* 💡 음성 듣기 버튼 */
+.tts-btn { background: #f0f7ff; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; margin-bottom: 20px; }
+.tts-btn:hover { background: var(--accent-blue); color: white; }
+
 .detail-title { font-family:'Playfair Display', serif; font-size: 2rem; font-weight: 700; margin-bottom: 5px; color: var(--text-main); }
 .detail-author { font-size: 1rem; color: var(--text-muted); margin-bottom: 30px; }
 
-.section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 10px; font-weight: 700; }
-.detail-quote { font-family:'Playfair Display', serif; font-size: 1.1rem; font-style: italic; line-height: 1.8; color: var(--accent-blue); margin-bottom: 30px; position: relative; padding: 0 20px; }
-.detail-review { font-size: 0.95rem; line-height: 1.8; color: #444; text-align: left; width: 100%; border-top: 1px solid var(--border-color); padding-top: 30px; white-space: pre-wrap; }
+/* 💡 뷰어 변수가 적용되는 텍스트 영역 */
+.reader-area { width: 100%; padding: var(--post-padding); box-sizing: border-box; }
+
+.section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 15px; font-weight: 700; display: block; }
+.detail-quote { 
+    font-family:'Playfair Display', serif; 
+    font-size: calc(var(--post-font-size) + 0.15rem); 
+    line-height: var(--post-line-height); 
+    font-style: italic; color: var(--accent-blue); margin-bottom: 35px; word-break: keep-all; 
+}
+.detail-review { 
+    font-size: var(--post-font-size); 
+    line-height: var(--post-line-height); 
+    color: #444; text-align: left; border-top: 1px solid var(--border-color); 
+    padding-top: 30px; white-space: pre-wrap; 
+}
 
 .detail-actions { margin-top: 40px; display: flex; gap: 10px; width: 100%; justify-content: center; border-top: 1px solid var(--border-color); padding-top: 20px; }
 .action-btn { background: #f5f5f5; border: none; padding: 10px 20px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; color: var(--text-main); font-weight: 500; transition: 0.2s; }
@@ -78,7 +101,31 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-color); col
 .form-group input, .form-group textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 0.95rem; outline: none; background: #fafafa; }
 .form-group input:focus, .form-group textarea:focus { border-color: var(--accent-blue); background: white; }
 .form-group textarea { min-height: 120px; resize: vertical; }
+
+/* 💡 사진 직접 첨부 박스 스타일 */
+.file-box { border: 1px dashed #ccc; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 20px; cursor: pointer; color: #888; font-size: 0.9rem; background: #fafafa; transition: 0.2s; }
+.file-box:hover { border-color: var(--accent-blue); color: var(--accent-blue); background: #f0f7ff; }
+
 .save-btn { width: 100%; background: var(--accent-blue); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; }
+
+/* 💡 뷰어 설정 플로팅 버튼 및 모달 */
+.fab-viewer {
+    position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px;
+    background: white; color: var(--accent-blue); border: 1px solid var(--accent-blue);
+    border-radius: 50%; box-shadow: 0 4px 15px rgba(0, 63, 127, 0.2);
+    font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 100; transition: 0.2s; font-family: 'Playfair Display', serif;
+}
+.fab-viewer:hover { transform: scale(1.05); background: var(--accent-blue); color: white; }
+
+.viewer-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+.viewer-modal-overlay.open { display: flex; }
+.viewer-modal-content { background: white; width: 100%; max-width: 350px; padding: 30px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); position: relative; }
+.v-close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #aaa; background: none; border: none; }
+.setting-group { margin-bottom: 20px; }
+.setting-group label { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; color: #555; margin-bottom: 10px; }
+.setting-group input[type="range"] { width: 100%; accent-color: var(--accent-blue); cursor: pointer; }
+
 </style>
 </head>
 <body>
@@ -99,15 +146,13 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-color); col
 </header>
 
 <main class="container">
-  <div class="book-grid" id="bookGrid">
-    </div>
+  <div class="book-grid" id="bookGrid"></div>
 </main>
 
 <div class="modal-overlay" id="detailModal">
   <div class="modal-content">
     <button class="close-btn" onclick="closeModal('detailModal')">×</button>
-    <div class="detail-layout" id="detailContent">
-      </div>
+    <div class="detail-layout" id="detailContent"></div>
   </div>
 </div>
 
@@ -124,10 +169,12 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-color); col
       <label>지은이</label>
       <input type="text" id="f-author" placeholder="예: 레프 톨스토이">
     </div>
-    <div class="form-group">
-      <label>책 표지 이미지 URL</label>
-      <input type="text" id="f-img" placeholder="http://... (이미지 링크 복사해서 붙여넣기)">
+    
+    <div class="file-box" onclick="document.getElementById('f-img-file').click()" id="fileBoxText">
+        + 책 표지 사진 첨부 (터치)
     </div>
+    <input type="file" id="f-img-file" hidden accept="image/*">
+    
     <div class="form-group">
       <label>발췌 (기억하고 싶은 문장)</label>
       <textarea id="f-quote" placeholder="인상 깊었던 구절을 적어주세요."></textarea>
@@ -140,19 +187,97 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-color); col
   </div>
 </div>
 
+<button class="fab-viewer" onclick="openViewerModal()" title="뷰어 설정">Aa</button>
+
+<div class="viewer-modal-overlay" id="viewerModal">
+    <div class="viewer-modal-content">
+        <button class="v-close-btn" onclick="closeViewerModal()">×</button>
+        <h3 style="margin-top:0; margin-bottom: 20px; font-size:1.2rem; color: var(--accent-blue);">독서 뷰어 설정</h3>
+        
+        <div class="setting-group">
+            <label><span>글자 크기</span></label>
+            <input type="range" id="v-fontSize" min="0.8" max="1.5" step="0.05" oninput="updateViewerSettings()">
+        </div>
+        <div class="setting-group">
+            <label><span>줄 간격</span></label>
+            <input type="range" id="v-lineHeight" min="1.4" max="2.4" step="0.1" oninput="updateViewerSettings()">
+        </div>
+        <div class="setting-group">
+            <label><span>안쪽 여백</span></label>
+            <input type="range" id="v-padding" min="10" max="60" step="2" oninput="updateViewerSettings()">
+        </div>
+        
+        <button class="action-btn" style="width:100%; margin-top:10px; padding:12px; background:#f0f0f0; border:none;" onclick="resetViewerSettings()">기본값으로 복구</button>
+    </div>
+</div>
+
 <script>
+// --- 💡 뷰어 설정 관리 로직 ---
+const defaultViewer = { fontSize: 1.0, lineHeight: 1.8, padding: 30 };
+let viewerSettings = JSON.parse(localStorage.getItem('lenaViewerSettings')) || defaultViewer;
+
+function applyViewerSettings() {
+    document.documentElement.style.setProperty('--post-font-size', viewerSettings.fontSize + 'rem');
+    document.documentElement.style.setProperty('--post-line-height', viewerSettings.lineHeight);
+    document.documentElement.style.setProperty('--post-padding', viewerSettings.padding + 'px');
+    
+    document.getElementById('v-fontSize').value = viewerSettings.fontSize;
+    document.getElementById('v-lineHeight').value = viewerSettings.lineHeight;
+    document.getElementById('v-padding').value = viewerSettings.padding;
+}
+
+function updateViewerSettings() {
+    viewerSettings = {
+        fontSize: document.getElementById('v-fontSize').value,
+        lineHeight: document.getElementById('v-lineHeight').value,
+        padding: document.getElementById('v-padding').value
+    };
+    localStorage.setItem('lenaViewerSettings', JSON.stringify(viewerSettings));
+    applyViewerSettings();
+}
+
+function resetViewerSettings() {
+    viewerSettings = { ...defaultViewer };
+    localStorage.setItem('lenaViewerSettings', JSON.stringify(viewerSettings));
+    applyViewerSettings();
+}
+
+function openViewerModal() { document.getElementById('viewerModal').classList.add('open'); }
+function closeViewerModal() { document.getElementById('viewerModal').classList.remove('open'); }
+
+applyViewerSettings(); // 초기 로드 시 적용
+
+
+// --- 메인 라이브러리 기능 ---
 const defaultBooks = [
   { id: 1, title: "안나 카레니나", author: "레프 톨스토이", img: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=600&q=80", quote: "행복한 가정은 모두 엇비슷하고, 불행한 가정은 불행한 이유가 제각기 다르다.", review: "인간 본성에 대한 날카로운 통찰력. 캐릭터의 겉모습이 벗겨지며 진정한 내면이 드러나는 과정이 압권이다." },
   { id: 2, title: "호밀밭의 파수꾼", author: "J.D. 샐린저", img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80", quote: "나는 늘 넓은 호밀밭에서 꼬마들이 재미있게 놀고 있는 모습을 상상하곤 했어.", review: "사회적 부조리와 허위에 대한 홀든의 시선. 복잡하고 어지러운 세상 속에서 순수함을 지키려는 몸부림." }
 ];
 
-let books = JSON.parse(localStorage.getItem('lena_premium_lib'));
+let books = JSON.parse(localStorage.getItem('lena_premium_lib_v3'));
 if (!books || books.length === 0) {
     books = defaultBooks;
-    localStorage.setItem('lena_premium_lib', JSON.stringify(books));
+    localStorage.setItem('lena_premium_lib_v3', JSON.stringify(books));
 }
 
 let currentEditId = null;
+let currentSelectedImg = ""; 
+let currentSpeakingId = null;
+
+// 💡 사진 직접 첨부 처리
+document.getElementById('f-img-file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if(file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => { 
+            currentSelectedImg = ev.target.result; 
+            document.getElementById('fileBoxText').innerHTML = "✔️ 표지 첨부 완료 (클릭 시 변경)";
+            document.getElementById('fileBoxText').style.borderColor = "var(--accent-blue)";
+            document.getElementById('fileBoxText').style.color = "var(--accent-blue)";
+        };
+        reader.readAsDataURL(file);
+    }
+});
 
 function renderGrid() {
     const grid = document.getElementById('bookGrid');
@@ -172,7 +297,42 @@ function renderGrid() {
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = 'auto'; }
+function closeModal(id) { 
+    document.getElementById(id).classList.remove('open'); document.body.style.overflow = 'auto'; 
+    // 창을 닫을 때 음성이 재생 중이면 정지
+    if(window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        currentSpeakingId = null;
+    }
+}
+
+// 💡 텍스트 음성 변환 (TTS) 기능
+function toggleTTS(id) {
+    if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        if (currentSpeakingId === id) {
+            currentSpeakingId = null;
+            return; 
+        }
+    }
+
+    const b = books.find(item => item.id === id);
+    if(!b) return;
+    
+    // 제목, 작가, 발췌문, 감상평을 이어서 읽도록 구성
+    let textToRead = b.title + "....... 지은이, " + (b.author || "미상") + "....... ";
+    if(b.quote) textToRead += "발췌문. " + b.quote + "....... ";
+    if(b.review) textToRead += "감상평. " + b.review;
+
+    const utterance = new SpeechSynthesisUtterance(textToRead);
+    utterance.lang = 'ko-KR'; 
+    utterance.rate = 0.95; 
+    
+    utterance.onend = function() { currentSpeakingId = null; };
+
+    window.speechSynthesis.speak(utterance);
+    currentSpeakingId = id;
+}
 
 function openDetail(id) {
     const b = books.find(item => item.id === id);
@@ -186,13 +346,17 @@ function openDetail(id) {
         <h2 class="detail-title">${b.title}</h2>
         <div class="detail-author">${b.author}</div>
         
-        ${b.quote ? `
-        <div class="section-title">Highlight</div>
-        <div class="detail-quote">"${b.quote}"</div>` : ''}
+        <button class="tts-btn" onclick="toggleTTS(${b.id})">🔊 이 기록 듣기</button>
         
-        ${b.review ? `
-        <div class="section-title" style="text-align:left; width:100%; border-top:1px solid #eee; padding-top:20px;">Book Report</div>
-        <div class="detail-review">${b.review}</div>` : ''}
+        <div class="reader-area">
+            ${b.quote ? `
+            <span class="section-title">Highlight</span>
+            <div class="detail-quote">"${b.quote}"</div>` : ''}
+            
+            ${b.review ? `
+            <span class="section-title">Book Report</span>
+            <div class="detail-review">${b.review}</div>` : ''}
+        </div>
         
         <div class="detail-actions">
             <button class="action-btn" onclick="openForm(${b.id})">수정하기</button>
@@ -210,16 +374,29 @@ function openForm(id = null) {
         const b = books.find(item => item.id === id);
         document.getElementById('f-title').value = b.title;
         document.getElementById('f-author').value = b.author || '';
-        document.getElementById('f-img').value = b.img || '';
         document.getElementById('f-quote').value = b.quote || '';
         document.getElementById('f-review').value = b.review || '';
+        currentSelectedImg = b.img || "";
+        
+        if(b.img) {
+            document.getElementById('fileBoxText').innerHTML = "✔️ 기존 표지 유지 (클릭 시 변경)";
+            document.getElementById('fileBoxText').style.color = "var(--accent-blue)";
+            document.getElementById('fileBoxText').style.borderColor = "var(--accent-blue)";
+        } else {
+            document.getElementById('fileBoxText').innerHTML = "+ 책 표지 사진 첨부 (터치)";
+            document.getElementById('fileBoxText').style.color = "#888";
+            document.getElementById('fileBoxText').style.borderColor = "#ccc";
+        }
         document.getElementById('formTitle').innerText = "Edit Book";
     } else {
         document.getElementById('f-title').value = '';
         document.getElementById('f-author').value = '';
-        document.getElementById('f-img').value = '';
         document.getElementById('f-quote').value = '';
         document.getElementById('f-review').value = '';
+        currentSelectedImg = "";
+        document.getElementById('fileBoxText').innerHTML = "+ 책 표지 사진 첨부 (터치)";
+        document.getElementById('fileBoxText').style.color = "#888";
+        document.getElementById('fileBoxText').style.borderColor = "#ccc";
         document.getElementById('formTitle').innerText = "Add a Book";
     }
     openModal('formModal');
@@ -228,13 +405,12 @@ function openForm(id = null) {
 function handleSave() {
     const title = document.getElementById('f-title').value;
     const author = document.getElementById('f-author').value;
-    const img = document.getElementById('f-img').value;
     const quote = document.getElementById('f-quote').value;
     const review = document.getElementById('f-review').value;
 
     if(!title) return alert("책 제목은 꼭 입력해 주세요.");
 
-    const data = { id: currentEditId || Date.now(), title, author, img, quote, review };
+    const data = { id: currentEditId || Date.now(), title, author, img: currentSelectedImg, quote, review };
 
     if(currentEditId) {
         const idx = books.findIndex(b => b.id === currentEditId);
@@ -243,7 +419,7 @@ function handleSave() {
         books.unshift(data);
     }
     
-    localStorage.setItem('lena_premium_lib', JSON.stringify(books));
+    localStorage.setItem('lena_premium_lib_v3', JSON.stringify(books));
     renderGrid();
     closeModal('formModal');
     if(currentEditId) openDetail(currentEditId);
@@ -252,7 +428,7 @@ function handleSave() {
 function deleteBook(id) {
     if(!confirm("이 기록을 완전히 삭제하시겠습니까?")) return;
     books = books.filter(b => b.id !== id);
-    localStorage.setItem('lena_premium_lib', JSON.stringify(books));
+    localStorage.setItem('lena_premium_lib_v3', JSON.stringify(books));
     closeModal('detailModal');
     renderGrid();
 }
