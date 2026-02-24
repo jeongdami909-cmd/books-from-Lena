@@ -8,9 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* 배경색: 색을 다운시켜 흰색에 가까운 아주 은은한 웜화이트(아이보리) 느낌으로 변경 */
+  /* 배경색: 은은한 웜화이트(아이보리) 느낌 유지 */
   --bg-color: #fdfdf6; 
-  /* 사이트 제목 및 포인트 색상: 책 표지의 파란색과 동일 */
+  /* 포인트 색상: 책 표지의 파란색(Deep Blue) */
   --accent-blue: #003f7f;
   --text-main: #222222;
   --text-muted: #666666;
@@ -21,10 +21,23 @@
 body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-color); color: var(--text-main); min-height: 100vh; padding-bottom: 80px; }
 
 /* 헤더 스타일 */
-.site-header { text-align: center; padding: 60px 20px 40px; }
-.profile-pic { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-.site-title { font-family:'Playfair Display', serif; font-size: 2.5rem; font-weight:700; color: var(--accent-blue); margin-bottom: 10px; }
-.site-subtitle { font-size: 0.95rem; color: var(--text-muted); font-weight: 300; max-width: 500px; margin: 0 auto 30px; line-height: 1.6; }
+.site-header { text-align: center; padding: 50px 20px 30px; display: flex; flex-direction: column; align-items: center; }
+.profile-pic { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.site-title { font-family:'Playfair Display', serif; font-size: 2.5rem; font-weight:700; color: var(--accent-blue); margin-bottom: 8px; }
+.site-subtitle { font-size: 0.9rem; color: var(--text-muted); font-weight: 300; max-width: 500px; margin: 0 auto 20px; line-height: 1.6; }
+
+/* 💡 작고 세련된 구글 검색창 추가 */
+.google-search-container { width: 100%; max-width: 320px; margin-bottom: 25px; }
+.google-search-form { 
+    display: flex; align-items: center; background: white; border-radius: 50px; 
+    padding: 6px 15px; box-shadow: 0 4px 10px rgba(0, 63, 127, 0.08); 
+    border: 1px solid var(--border-color); transition: 0.3s;
+}
+.google-search-form:focus-within { border-color: var(--accent-blue); box-shadow: 0 4px 12px rgba(0, 63, 127, 0.15); }
+.google-search-form button { background: none; border: none; font-size: 1rem; cursor: pointer; color: #888; padding: 0; margin-right: 8px; }
+.google-search-form input { flex: 1; border: none; outline: none; background: transparent; font-family: 'Noto Sans KR', sans-serif; font-size: 0.85rem; color: var(--text-main); }
+.google-search-form input::placeholder { color: #bbb; }
+
 .btn-new { background: transparent; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px 24px; border-radius: 50px; cursor: pointer; font-size: 0.85rem; transition: 0.3s; }
 .btn-new:hover { background: var(--accent-blue); color: white; }
 
@@ -74,6 +87,14 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-color); col
   <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=200&q=80" alt="Profile" class="profile-pic">
   <h1 class="site-title">Lena's Library</h1>
   <p class="site-subtitle">나를 구성하는 문장들과 깊은 사유의 기록들. 책 표지를 클릭하면 상세한 북리포트를 읽을 수 있습니다.</p>
+  
+  <div class="google-search-container">
+      <form action="https://www.google.com/search" method="GET" target="_blank" class="google-search-form" onsubmit="return true;">
+          <button type="submit">🔍</button>
+          <input type="search" name="q" placeholder="책 정보 구글 검색..." required>
+      </form>
+  </div>
+
   <button class="btn-new" onclick="openForm()">+ 새로운 책 기록하기</button>
 </header>
 
